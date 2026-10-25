@@ -5,301 +5,363 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Data Quality Checker</title>
   <style>
-    *, *::before, *::after { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      margin: 0;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #0f172a;
+      background: #f8fafc;
       min-height: 100vh;
-      background: #f0f2f5;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      font-size: 15px;
-      color: #1a1a2e;
     }
 
-    /* ── top bar ── */
-    header {
-      background: #1a1a2e;
-      color: #fff;
-      padding: 0 24px;
-      height: 56px;
+    /* ── nav ── */
+    nav {
+      height: 52px;
+      background: #0f172a;
       display: flex;
       align-items: center;
-      gap: 12px;
+      padding: 0 28px;
+      gap: 10px;
     }
-    header svg { flex-shrink: 0; }
-    header h1 {
-      font-size: 17px;
+    nav .logo-mark {
+      width: 28px; height: 28px;
+      background: #3b82f6;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    nav .logo-mark svg { display: block; }
+    nav .app-name {
+      font-size: 14px;
       font-weight: 600;
-      margin: 0;
+      color: #f8fafc;
+      letter-spacing: .2px;
+    }
+    nav .divider { width: 1px; height: 18px; background: #334155; margin: 0 6px; }
+    nav .sub {
+      font-size: 12px;
+      color: #94a3b8;
       letter-spacing: .3px;
     }
-    header span {
+    nav .version {
       margin-left: auto;
-      font-size: 12px;
-      opacity: .55;
+      font-size: 11px;
+      color: #475569;
+      font-variant-numeric: tabular-nums;
       letter-spacing: .5px;
-      text-transform: uppercase;
     }
 
-    /* ── layout ── */
-    main {
-      max-width: 700px;
-      margin: 36px auto;
-      padding: 0 16px 60px;
+    /* ── page ── */
+    .page {
+      max-width: 680px;
+      margin: 40px auto;
+      padding: 0 16px 80px;
     }
 
-    .section-title {
+    .page-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+    .page-desc {
       font-size: 13px;
+      color: #64748b;
+      margin-bottom: 28px;
+    }
+
+    /* ── section label ── */
+    .label {
+      font-size: 11px;
       font-weight: 700;
       letter-spacing: .8px;
       text-transform: uppercase;
-      color: #555;
-      margin: 0 0 10px;
+      color: #64748b;
+      margin-bottom: 8px;
     }
 
-    /* ── upload card ── */
-    .card {
+    /* ── upload panel ── */
+    .panel {
       background: #fff;
-      border: 1px solid #dde1e9;
-      border-radius: 6px;
-      padding: 24px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
       margin-bottom: 20px;
     }
 
-    label.drop-zone {
-      display: block;
-      border: 2px dashed #c0c6d4;
-      border-radius: 5px;
-      padding: 32px 20px;
+    .drop {
+      border: 1px dashed #cbd5e1;
+      border-radius: 6px;
+      padding: 36px 24px;
       text-align: center;
       cursor: pointer;
-      transition: border-color .15s, background .15s;
+      transition: border-color .15s, background .12s;
     }
-    label.drop-zone:hover,
-    label.drop-zone.over { border-color: #3b6fd4; background: #f4f7ff; }
-    label.drop-zone input { display: none; }
-    .drop-icon { font-size: 32px; line-height: 1; margin-bottom: 8px; }
-    .drop-main { font-weight: 600; color: #3b6fd4; }
-    .drop-sub { font-size: 13px; color: #888; margin-top: 4px; }
-    .drop-file { font-weight: 600; color: #1a1a2e; font-size: 14px; }
+    .drop:hover, .drop.over {
+      border-color: #3b82f6;
+      background: #f0f7ff;
+    }
+    .drop input { display: none; }
 
-    .col-hint {
+    .drop-icon {
+      width: 40px; height: 40px;
+      margin: 0 auto 12px;
+    }
+    .drop-icon svg { display: block; }
+
+    .drop-cta { font-weight: 600; color: #3b82f6; font-size: 14px; }
+    .drop-cta span { color: #0f172a; }
+    .drop-hint { font-size: 12px; color: #94a3b8; margin-top: 3px; }
+    .drop-file { font-weight: 600; font-size: 14px; color: #0f172a; }
+
+    .meta {
       margin-top: 14px;
+      padding: 10px 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
       font-size: 12px;
-      color: #888;
+      color: #475569;
     }
-    .col-hint strong { color: #555; }
+    .meta strong { color: #334155; }
 
-    .btn {
-      margin-top: 16px;
+    .btn-primary {
+      margin-top: 14px;
       width: 100%;
-      padding: 11px;
-      font: 600 15px inherit;
-      background: #1a1a2e;
-      color: #fff;
+      padding: 10px 0;
+      font: 600 14px inherit;
+      letter-spacing: .2px;
+      background: #0f172a;
+      color: #f8fafc;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
-      letter-spacing: .3px;
-      transition: background .15s;
+      transition: background .12s;
     }
-    .btn:hover:not(:disabled) { background: #2e2e50; }
-    .btn:disabled { background: #b0b4be; cursor: default; }
+    .btn-primary:hover:not(:disabled) { background: #1e293b; }
+    .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
 
-    /* ── error banner ── */
-    #error {
+    /* ── error ── */
+    .error-bar {
       display: none;
-      padding: 12px 16px;
-      background: #fff3f3;
-      border: 1px solid #f5b8b8;
-      border-radius: 5px;
-      color: #b00;
-      font-size: 14px;
+      padding: 11px 14px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 6px;
+      color: #991b1b;
+      font-size: 13px;
       margin-bottom: 20px;
     }
 
     /* ── results ── */
     #results { display: none; }
 
-    .stats-row {
+    .stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
       margin-bottom: 20px;
     }
-    .stat-box {
+    .stat {
       background: #fff;
-      border: 1px solid #dde1e9;
-      border-radius: 6px;
-      padding: 18px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px 16px;
       text-align: center;
     }
-    .stat-box .num {
-      font-size: 32px;
+    .stat .n {
+      font-size: 36px;
       font-weight: 700;
       line-height: 1;
-      margin-bottom: 4px;
+      margin-bottom: 5px;
+      font-variant-numeric: tabular-nums;
     }
-    .stat-box .lbl { font-size: 12px; color: #888; letter-spacing: .3px; }
-    .stat-box.clean .num { color: #1a7a45; }
-    .stat-box.problems .num { color: #c0392b; }
-    .stat-box.total .num { color: #1a1a2e; }
+    .stat .t { font-size: 11px; color: #64748b; letter-spacing: .3px; text-transform: uppercase; }
+    .stat.s-total  .n { color: #0f172a; }
+    .stat.s-clean  .n { color: #15803d; }
+    .stat.s-issues .n { color: #dc2626; }
 
-    .table-card {
+    /* ── issue table ── */
+    .table-wrap {
       background: #fff;
-      border: 1px solid #dde1e9;
-      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
       overflow: hidden;
     }
-    .table-head {
-      padding: 14px 20px;
-      border-bottom: 1px solid #dde1e9;
+    .table-header {
       display: flex;
       align-items: center;
       gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1px solid #e2e8f0;
+      background: #fff;
     }
-    .table-head h2 { font-size: 15px; font-weight: 600; margin: 0; }
-    .badge {
+    .table-header h2 { font-size: 14px; font-weight: 600; color: #0f172a; }
+    .pill {
       font-size: 11px;
       font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 20px;
-      background: #fde8e8;
-      color: #c0392b;
+      padding: 2px 9px;
+      border-radius: 999px;
     }
-    .badge.ok { background: #e3f6ec; color: #1a7a45; }
+    .pill.has-issues  { background: #fee2e2; color: #991b1b; }
+    .pill.no-issues   { background: #dcfce7; color: #166534; }
 
     table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #f8fafc; }
     th {
-      background: #f8f9fb;
+      padding: 9px 20px;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: .6px;
       text-transform: uppercase;
-      color: #888;
-      padding: 9px 20px;
+      color: #64748b;
       text-align: left;
-      border-bottom: 1px solid #dde1e9;
+      border-bottom: 1px solid #e2e8f0;
     }
     td {
-      padding: 10px 20px;
-      font-size: 14px;
-      border-bottom: 1px solid #f0f2f5;
+      padding: 11px 20px;
+      font-size: 13px;
+      border-bottom: 1px solid #f1f5f9;
       vertical-align: top;
     }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #f8f9fb; }
+    tbody tr:hover td { background: #f8fafc; }
+    .td-row  { font-weight: 600; color: #3b82f6; font-variant-numeric: tabular-nums; width: 70px; }
+    .td-col  { font-weight: 500; color: #0f172a; width: 160px; }
+    .td-msg  { color: #475569; }
 
-    .row-num {
-      font-weight: 600;
-      color: #3b6fd4;
-      font-variant-numeric: tabular-nums;
-    }
-    .col-name { font-weight: 500; color: #1a1a2e; }
-    .problem-text { color: #555; }
-
-    .all-good {
-      padding: 24px 20px;
+    .empty-state {
+      padding: 32px 20px;
       text-align: center;
-      color: #1a7a45;
-      font-weight: 500;
+      color: #64748b;
+      font-size: 13px;
     }
-    .all-good .check { font-size: 28px; display: block; margin-bottom: 6px; }
+    .empty-state .checkmark {
+      width: 36px; height: 36px;
+      margin: 0 auto 10px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .empty-state .checkmark svg { display: block; }
+    .empty-state strong { display: block; color: #166534; font-size: 14px; margin-bottom: 3px; }
 
-    @media (max-width: 480px) {
-      .stats-row { grid-template-columns: 1fr; }
+    @media (max-width: 500px) {
+      .stats { grid-template-columns: 1fr; }
+      .stat { padding: 14px 12px; }
     }
   </style>
 </head>
 <body>
 
-<header>
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-       stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-    <polyline points="14 2 14 8 20 8"/>
-    <line x1="9" y1="13" x2="15" y2="13"/>
-    <line x1="9" y1="17" x2="12" y2="17"/>
-  </svg>
-  <h1>Data Quality Checker</h1>
-  <span>Survey Records</span>
-</header>
+<nav>
+  <div class="logo-mark">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M2 3h12v1.5H2V3zm0 4h8v1.5H2V7zm0 4h10v1.5H2V11z" fill="#fff"/>
+    </svg>
+  </div>
+  <span class="app-name">DataQC</span>
+  <div class="divider"></div>
+  <span class="sub">Survey Records</span>
+  <span class="version">v0.1.0</span>
+</nav>
 
-<main>
+<div class="page">
 
-  <p class="section-title">Upload file</p>
-  <div class="card">
+  <h1 class="page-title">Data Quality Checker</h1>
+  <p class="page-desc">Upload a CSV file to check for missing fields, invalid coordinates, and duplicate record IDs.</p>
+
+  <p class="label">Upload</p>
+  <div class="panel">
     <form id="form">
-      <label class="drop-zone" id="drop">
+      <label class="drop" id="drop">
         <input type="file" id="file" accept=".csv,text/csv">
-        <div class="drop-icon">📄</div>
-        <div id="drop-main" class="drop-main">Choose a CSV file</div>
-        <div class="drop-sub">or drag and drop it here</div>
+        <div class="drop-icon">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <rect width="40" height="40" rx="8" fill="#f1f5f9"/>
+            <path d="M13 27V16l7-7h7v18H13z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
+            <path d="M20 9v7h7" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
+            <line x1="17" y1="21" x2="23" y2="21" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="17" y1="24" x2="21" y2="24" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div id="drop-cta" class="drop-cta"><span>Drop a CSV file here, or </span>click to browse</div>
+        <div id="drop-hint" class="drop-hint">CSV up to 5 MB</div>
       </label>
-      <div class="col-hint">
-        <strong>Required columns:</strong> record_id, name, district, latitude, longitude
-      </div>
-      <button class="btn" id="submit" type="submit" disabled>Check file</button>
+      <div class="meta"><strong>Required columns:</strong> record_id &nbsp;·&nbsp; name &nbsp;·&nbsp; district &nbsp;·&nbsp; latitude &nbsp;·&nbsp; longitude</div>
+      <button class="btn-primary" id="submit" type="submit" disabled>Run check</button>
     </form>
   </div>
 
-  <div id="error" role="alert"></div>
+  <div class="error-bar" id="error" role="alert"></div>
 
   <section id="results">
-    <p class="section-title">Results</p>
-    <div class="stats-row">
-      <div class="stat-box total">
-        <div class="num" id="rows">0</div>
-        <div class="lbl">Rows in file</div>
+    <p class="label">Results</p>
+    <div class="stats">
+      <div class="stat s-total">
+        <div class="n" id="rows">0</div>
+        <div class="t">Total rows</div>
       </div>
-      <div class="stat-box clean">
-        <div class="num" id="clean">0</div>
-        <div class="lbl">Clean rows</div>
+      <div class="stat s-clean">
+        <div class="n" id="clean">0</div>
+        <div class="t">Clean rows</div>
       </div>
-      <div class="stat-box problems">
-        <div class="num" id="issueCount">0</div>
-        <div class="lbl">Problems found</div>
+      <div class="stat s-issues">
+        <div class="n" id="issueCount">0</div>
+        <div class="t">Issues found</div>
       </div>
     </div>
 
-    <div class="table-card">
-      <div class="table-head">
+    <div class="table-wrap">
+      <div class="table-header">
         <h2>Issues</h2>
-        <span id="badge" class="badge">0</span>
+        <span id="pill" class="pill has-issues">0</span>
       </div>
-      <div id="allgood" class="all-good" style="display:none">
-        <span class="check">✓</span>
-        Every row passed all checks.
+      <div id="emptyState" class="empty-state" style="display:none">
+        <div class="checkmark">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M4 9l3.5 3.5L14 6" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <strong>All checks passed</strong>
+        Every row in this file is valid.
       </div>
-      <table id="issuesTable" style="display:none">
+      <table id="issueTable" style="display:none">
         <thead>
           <tr>
             <th>Row</th>
             <th>Column</th>
-            <th>Problem</th>
+            <th>Issue</th>
           </tr>
         </thead>
-        <tbody id="issues"></tbody>
+        <tbody id="issueBody"></tbody>
       </table>
     </div>
   </section>
 
-</main>
+</div>
 
 <script>
-  const form       = document.getElementById("form");
-  const fileInput  = document.getElementById("file");
-  const drop       = document.getElementById("drop");
-  const dropMain   = document.getElementById("drop-main");
-  const submit     = document.getElementById("submit");
-  const errorBox   = document.getElementById("error");
-  const results    = document.getElementById("results");
+  const form      = document.getElementById("form");
+  const fileInput = document.getElementById("file");
+  const drop      = document.getElementById("drop");
+  const dropCta   = document.getElementById("drop-cta");
+  const dropHint  = document.getElementById("drop-hint");
+  const submit    = document.getElementById("submit");
+  const errorBar  = document.getElementById("error");
+  const results   = document.getElementById("results");
 
   function setFile(file) {
     if (!file) return;
-    drop.querySelector(".drop-icon").textContent = "📋";
-    dropMain.textContent = file.name;
-    dropMain.className = "drop-file";
+    dropCta.innerHTML = "";
+    const s = document.createElement("span");
+    s.textContent = file.name;
+    dropCta.className = "drop-file";
+    dropCta.appendChild(s);
+    dropHint.textContent = (file.size / 1024).toFixed(0) + " KB";
     submit.disabled = false;
   }
 
@@ -310,53 +372,44 @@
   ["dragleave","drop"].forEach(e =>
     drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove("over"); }));
   drop.addEventListener("drop", ev => {
-    const file = ev.dataTransfer.files[0];
-    if (file) {
-      const dt = new DataTransfer();
-      dt.items.add(file);
-      fileInput.files = dt.files;
-      setFile(file);
-    }
+    const f = ev.dataTransfer.files[0];
+    if (f) { const dt = new DataTransfer(); dt.items.add(f); fileInput.files = dt.files; setFile(f); }
   });
 
-  function cell(text, cls) {
-    const td = document.createElement("td");
-    td.textContent = text;
-    if (cls) td.className = cls;
-    return td;
+  function td(text, cls) {
+    const el = document.createElement("td");
+    el.className = cls;
+    el.textContent = text;
+    return el;
   }
 
   function showError(msg) {
-    errorBox.textContent = msg;
-    errorBox.style.display = "block";
+    errorBar.textContent = msg;
+    errorBar.style.display = "block";
     results.style.display = "none";
   }
 
   function showResults(data) {
-    errorBox.style.display = "none";
-    document.getElementById("rows").textContent       = data.rows;
-    document.getElementById("clean").textContent      = data.clean_rows;
+    errorBar.style.display = "none";
+    document.getElementById("rows").textContent      = data.rows;
+    document.getElementById("clean").textContent     = data.clean_rows;
     document.getElementById("issueCount").textContent = data.issues.length;
 
-    const badge = document.getElementById("badge");
-    badge.textContent = data.issues.length;
-    badge.className = data.issues.length === 0 ? "badge ok" : "badge";
+    const pill = document.getElementById("pill");
+    pill.textContent = data.issues.length;
+    pill.className   = "pill " + (data.issues.length === 0 ? "no-issues" : "has-issues");
 
-    const tbody = document.getElementById("issues");
-    tbody.innerHTML = "";
-    data.issues.forEach(issue => {
+    const body = document.getElementById("issueBody");
+    body.innerHTML = "";
+    data.issues.forEach(i => {
       const tr = document.createElement("tr");
-      tr.append(
-        cell(issue.row    ?? "—", "row-num"),
-        cell(issue.column ?? "—", "col-name"),
-        cell(issue.problem,       "problem-text")
-      );
-      tbody.append(tr);
+      tr.append(td(i.row ?? "—", "td-row"), td(i.column ?? "—", "td-col"), td(i.problem, "td-msg"));
+      body.appendChild(tr);
     });
 
     const none = data.issues.length === 0;
-    document.getElementById("allgood").style.display      = none ? "block" : "none";
-    document.getElementById("issuesTable").style.display  = none ? "none"  : "table";
+    document.getElementById("emptyState").style.display  = none ? "block" : "none";
+    document.getElementById("issueTable").style.display  = none ? "none"  : "table";
     results.style.display = "block";
     results.scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -365,14 +418,11 @@
     e.preventDefault();
     const file = fileInput.files[0];
     if (!file) return;
-
-    errorBox.style.display = "none";
+    errorBar.style.display = "none";
     submit.disabled = true;
-    submit.textContent = "Checking…";
-
+    submit.textContent = "Running…";
     const body = new FormData();
     body.append("file", file);
-
     try {
       const res  = await fetch("/validate", { method: "POST", body });
       const data = await res.json();
@@ -382,7 +432,7 @@
       showError("Could not reach the server. Make sure it is running and try again.");
     } finally {
       submit.disabled = false;
-      submit.textContent = "Check file";
+      submit.textContent = "Run check";
     }
   });
 </script>

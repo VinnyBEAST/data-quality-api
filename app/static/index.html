@@ -4,153 +4,183 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Data Quality Checker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --nav:     #1a1612;
+      --bg:      #1f1b16;
+      --panel:   #2a251e;
+      --border:  #3a3530;
+      --text:    #f0ebe2;
+      --muted:   #8a7c6e;
+      --clean:   #a8c090;
+      --clean-bg:#1e2a1a;
+      --issue:   #c08080;
+      --issue-bg:#2a1a1a;
+      --btn:     #4a4035;
+      --btn-h:   #5a5040;
+    }
+
     body {
-      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 14px;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
       line-height: 1.5;
-      color: #0f172a;
-      background: #f8fafc;
       min-height: 100vh;
     }
 
     /* ── nav ── */
     nav {
-      height: 52px;
-      background: #0f172a;
+      background: var(--nav);
+      height: 54px;
       display: flex;
       align-items: center;
       padding: 0 28px;
-      gap: 10px;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
     }
-    nav .logo-mark {
-      width: 28px; height: 28px;
-      background: #3b82f6;
-      border-radius: 4px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
+    .logo {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -.3px;
+      color: var(--text);
     }
-    nav .logo-mark svg { display: block; }
-    nav .app-name {
-      font-size: 14px;
-      font-weight: 600;
-      color: #f8fafc;
-      letter-spacing: .2px;
+    .nav-divider {
+      width: 1px;
+      height: 16px;
+      background: var(--border);
     }
-    nav .divider { width: 1px; height: 18px; background: #334155; margin: 0 6px; }
-    nav .sub {
+    .nav-sub {
       font-size: 12px;
-      color: #94a3b8;
+      color: var(--muted);
       letter-spacing: .3px;
     }
-    nav .version {
+    .nav-ver {
       margin-left: auto;
       font-size: 11px;
-      color: #475569;
+      color: var(--muted);
       font-variant-numeric: tabular-nums;
-      letter-spacing: .5px;
     }
 
     /* ── page ── */
-    .page {
+    main {
       max-width: 680px;
       margin: 40px auto;
       padding: 0 16px 80px;
     }
 
     .page-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #0f172a;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
       margin-bottom: 4px;
+      letter-spacing: -.3px;
     }
     .page-desc {
       font-size: 13px;
-      color: #64748b;
+      color: var(--muted);
       margin-bottom: 28px;
     }
 
-    /* ── section label ── */
-    .label {
-      font-size: 11px;
+    .section-label {
+      font-size: 10px;
       font-weight: 700;
-      letter-spacing: .8px;
+      letter-spacing: .9px;
       text-transform: uppercase;
-      color: #64748b;
+      color: var(--muted);
       margin-bottom: 8px;
     }
 
-    /* ── upload panel ── */
-    .panel {
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
+    /* ── upload card ── */
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
       padding: 20px;
       margin-bottom: 20px;
     }
 
-    .drop {
-      border: 1px dashed #cbd5e1;
-      border-radius: 6px;
-      padding: 36px 24px;
+    .drop-zone {
+      display: block;
+      border: 1.5px dashed var(--border);
+      border-radius: 8px;
+      padding: 32px 20px;
       text-align: center;
       cursor: pointer;
-      transition: border-color .15s, background .12s;
+      transition: border-color .15s, background .15s;
     }
-    .drop:hover, .drop.over {
-      border-color: #3b82f6;
-      background: #f0f7ff;
+    .drop-zone:hover, .drop-zone.over {
+      border-color: var(--clean);
+      background: rgba(168,192,144,.05);
     }
-    .drop input { display: none; }
+    .drop-zone input { display: none; }
 
     .drop-icon {
-      width: 40px; height: 40px;
+      width: 42px;
+      height: 42px;
       margin: 0 auto 12px;
+      background: var(--btn);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .drop-icon svg { display: block; }
 
-    .drop-cta { font-weight: 600; color: #3b82f6; font-size: 14px; }
-    .drop-cta span { color: #0f172a; }
-    .drop-hint { font-size: 12px; color: #94a3b8; margin-top: 3px; }
-    .drop-file { font-weight: 600; font-size: 14px; color: #0f172a; }
+    .drop-cta {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+    .drop-hint {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .drop-file {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--clean);
+    }
 
-    .meta {
+    .col-hint {
       margin-top: 14px;
       padding: 10px 12px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 5px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
       font-size: 12px;
-      color: #475569;
+      color: var(--muted);
     }
-    .meta strong { color: #334155; }
+    .col-hint strong { color: var(--text); }
 
-    .btn-primary {
+    .run-btn {
       margin-top: 14px;
       width: 100%;
-      padding: 10px 0;
-      font: 600 14px inherit;
+      padding: 11px;
+      font: 700 14px 'Inter', sans-serif;
       letter-spacing: .2px;
-      background: #0f172a;
-      color: #f8fafc;
-      border: none;
-      border-radius: 6px;
+      background: var(--btn);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
       cursor: pointer;
-      transition: background .12s;
+      transition: background .15s;
     }
-    .btn-primary:hover:not(:disabled) { background: #1e293b; }
-    .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
+    .run-btn:hover:not(:disabled) { background: var(--btn-h); }
+    .run-btn:disabled { opacity: .4; cursor: not-allowed; }
 
     /* ── error ── */
     .error-bar {
       display: none;
       padding: 11px 14px;
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      border-radius: 6px;
-      color: #991b1b;
+      background: var(--issue-bg);
+      border: 1px solid var(--issue);
+      border-radius: 8px;
+      color: var(--issue);
       font-size: 13px;
       margin-bottom: 20px;
     }
@@ -161,145 +191,153 @@
     .stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 10px;
+      margin-bottom: 16px;
     }
     .stat {
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 20px 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 12px;
       text-align: center;
     }
     .stat .n {
-      font-size: 36px;
-      font-weight: 700;
+      font-size: 34px;
+      font-weight: 800;
       line-height: 1;
       margin-bottom: 5px;
       font-variant-numeric: tabular-nums;
+      letter-spacing: -.5px;
     }
-    .stat .t { font-size: 11px; color: #64748b; letter-spacing: .3px; text-transform: uppercase; }
-    .stat.s-total  .n { color: #0f172a; }
-    .stat.s-clean  .n { color: #15803d; }
-    .stat.s-issues .n { color: #dc2626; }
+    .stat .t {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .stat.s-total .n  { color: var(--text); }
+    .stat.s-clean .n  { color: var(--clean); }
+    .stat.s-issues .n { color: var(--issue); }
 
-    /* ── issue table ── */
+    /* ── table ── */
     .table-wrap {
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
       overflow: hidden;
     }
-    .table-header {
+    .table-head {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 14px 20px;
-      border-bottom: 1px solid #e2e8f0;
-      background: #fff;
+      padding: 13px 20px;
+      border-bottom: 1px solid var(--border);
     }
-    .table-header h2 { font-size: 14px; font-weight: 600; color: #0f172a; }
+    .table-head h2 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
     .pill {
       font-size: 11px;
       font-weight: 700;
       padding: 2px 9px;
-      border-radius: 999px;
+      border-radius: 20px;
     }
-    .pill.has-issues  { background: #fee2e2; color: #991b1b; }
-    .pill.no-issues   { background: #dcfce7; color: #166534; }
+    .pill.has  { background: var(--issue-bg); color: var(--issue); }
+    .pill.none { background: var(--clean-bg); color: var(--clean); }
 
     table { width: 100%; border-collapse: collapse; }
-    thead tr { background: #f8fafc; }
+    thead tr { background: var(--bg); }
     th {
       padding: 9px 20px;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
-      letter-spacing: .6px;
+      letter-spacing: .7px;
       text-transform: uppercase;
-      color: #64748b;
+      color: var(--muted);
       text-align: left;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid var(--border);
     }
     td {
       padding: 11px 20px;
       font-size: 13px;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px solid rgba(58,53,48,.6);
       vertical-align: top;
     }
     tr:last-child td { border-bottom: none; }
-    tbody tr:hover td { background: #f8fafc; }
-    .td-row  { font-weight: 600; color: #3b82f6; font-variant-numeric: tabular-nums; width: 70px; }
-    .td-col  { font-weight: 500; color: #0f172a; width: 160px; }
-    .td-msg  { color: #475569; }
+    tbody tr:hover td { background: rgba(255,255,255,.02); }
+    .td-row  { font-weight: 700; color: var(--clean); font-variant-numeric: tabular-nums; width: 70px; }
+    .td-col  { font-weight: 600; color: var(--text); width: 160px; }
+    .td-msg  { color: var(--muted); }
 
     .empty-state {
-      padding: 32px 20px;
+      padding: 28px 20px;
       text-align: center;
-      color: #64748b;
-      font-size: 13px;
     }
-    .empty-state .checkmark {
-      width: 36px; height: 36px;
+    .empty-icon {
+      width: 38px; height: 38px;
       margin: 0 auto 10px;
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
+      background: var(--clean-bg);
+      border: 1px solid var(--clean);
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
     }
-    .empty-state .checkmark svg { display: block; }
-    .empty-state strong { display: block; color: #166534; font-size: 14px; margin-bottom: 3px; }
+    .empty-icon svg { display: block; }
+    .empty-state strong {
+      display: block;
+      color: var(--clean);
+      font-size: 14px;
+      margin-bottom: 3px;
+    }
+    .empty-state span { font-size: 13px; color: var(--muted); }
 
     @media (max-width: 500px) {
       .stats { grid-template-columns: 1fr; }
-      .stat { padding: 14px 12px; }
     }
   </style>
 </head>
 <body>
 
 <nav>
-  <div class="logo-mark">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <path d="M2 3h12v1.5H2V3zm0 4h8v1.5H2V7zm0 4h10v1.5H2V11z" fill="#fff"/>
-    </svg>
-  </div>
-  <span class="app-name">DataQC</span>
-  <div class="divider"></div>
-  <span class="sub">Survey Records</span>
-  <span class="version">v0.1.0</span>
+  <span class="logo">DataQC</span>
+  <div class="nav-divider"></div>
+  <span class="nav-sub">Survey Records</span>
+  <span class="nav-ver">v0.1.0</span>
 </nav>
 
-<div class="page">
-
+<main>
   <h1 class="page-title">Data Quality Checker</h1>
   <p class="page-desc">Upload a CSV file to check for missing fields, invalid coordinates, and duplicate record IDs.</p>
 
-  <p class="label">Upload</p>
-  <div class="panel">
+  <p class="section-label">Upload</p>
+  <div class="card">
     <form id="form">
-      <label class="drop" id="drop">
+      <label class="drop-zone" id="drop">
         <input type="file" id="file" accept=".csv,text/csv">
         <div class="drop-icon">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-            <rect width="40" height="40" rx="8" fill="#f1f5f9"/>
-            <path d="M13 27V16l7-7h7v18H13z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
-            <path d="M20 9v7h7" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
-            <line x1="17" y1="21" x2="23" y2="21" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="17" y1="24" x2="21" y2="24" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M4 16V8l6-6h6v14H4z" stroke="#a8c090" stroke-width="1.4" stroke-linejoin="round"/>
+            <path d="M10 2v6h6" stroke="#a8c090" stroke-width="1.4" stroke-linejoin="round"/>
+            <line x1="7" y1="11" x2="13" y2="11" stroke="#a8c090" stroke-width="1.4" stroke-linecap="round"/>
+            <line x1="7" y1="14" x2="11" y2="14" stroke="#a8c090" stroke-width="1.4" stroke-linecap="round"/>
           </svg>
         </div>
-        <div id="drop-cta" class="drop-cta"><span>Drop a CSV file here, or </span>click to browse</div>
-        <div id="drop-hint" class="drop-hint">CSV up to 5 MB</div>
+        <div id="drop-cta" class="drop-cta">Drop a CSV file here, or click to browse</div>
+        <div id="drop-hint" class="drop-hint">CSV files up to 5 MB</div>
       </label>
-      <div class="meta"><strong>Required columns:</strong> record_id &nbsp;·&nbsp; name &nbsp;·&nbsp; district &nbsp;·&nbsp; latitude &nbsp;·&nbsp; longitude</div>
-      <button class="btn-primary" id="submit" type="submit" disabled>Run check</button>
+      <div class="col-hint">
+        <strong>Required columns:</strong>&nbsp; record_id &nbsp;·&nbsp; name &nbsp;·&nbsp; district &nbsp;·&nbsp; latitude &nbsp;·&nbsp; longitude
+      </div>
+      <button class="run-btn" id="submit" type="submit" disabled>Run check</button>
     </form>
   </div>
 
   <div class="error-bar" id="error" role="alert"></div>
 
   <section id="results">
-    <p class="label">Results</p>
+    <p class="section-label">Results</p>
     <div class="stats">
       <div class="stat s-total">
         <div class="n" id="rows">0</div>
@@ -311,23 +349,23 @@
       </div>
       <div class="stat s-issues">
         <div class="n" id="issueCount">0</div>
-        <div class="t">Issues found</div>
+        <div class="t">Issues</div>
       </div>
     </div>
 
     <div class="table-wrap">
-      <div class="table-header">
+      <div class="table-head">
         <h2>Issues</h2>
-        <span id="pill" class="pill has-issues">0</span>
+        <span id="pill" class="pill has">0</span>
       </div>
       <div id="emptyState" class="empty-state" style="display:none">
-        <div class="checkmark">
+        <div class="empty-icon">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M4 9l3.5 3.5L14 6" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 9l3.5 3.5L14 6" stroke="#a8c090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
         <strong>All checks passed</strong>
-        Every row in this file is valid.
+        <span>Every row in this file is valid.</span>
       </div>
       <table id="issueTable" style="display:none">
         <thead>
@@ -341,8 +379,7 @@
       </table>
     </div>
   </section>
-
-</div>
+</main>
 
 <script>
   const form      = document.getElementById("form");
@@ -356,11 +393,8 @@
 
   function setFile(file) {
     if (!file) return;
-    dropCta.innerHTML = "";
-    const s = document.createElement("span");
-    s.textContent = file.name;
     dropCta.className = "drop-file";
-    dropCta.appendChild(s);
+    dropCta.textContent = file.name;
     dropHint.textContent = (file.size / 1024).toFixed(0) + " KB";
     submit.disabled = false;
   }
@@ -391,13 +425,13 @@
 
   function showResults(data) {
     errorBar.style.display = "none";
-    document.getElementById("rows").textContent      = data.rows;
-    document.getElementById("clean").textContent     = data.clean_rows;
+    document.getElementById("rows").textContent       = data.rows;
+    document.getElementById("clean").textContent      = data.clean_rows;
     document.getElementById("issueCount").textContent = data.issues.length;
 
     const pill = document.getElementById("pill");
     pill.textContent = data.issues.length;
-    pill.className   = "pill " + (data.issues.length === 0 ? "no-issues" : "has-issues");
+    pill.className   = "pill " + (data.issues.length === 0 ? "none" : "has");
 
     const body = document.getElementById("issueBody");
     body.innerHTML = "";
@@ -408,8 +442,8 @@
     });
 
     const none = data.issues.length === 0;
-    document.getElementById("emptyState").style.display  = none ? "block" : "none";
-    document.getElementById("issueTable").style.display  = none ? "none"  : "table";
+    document.getElementById("emptyState").style.display = none ? "block" : "none";
+    document.getElementById("issueTable").style.display = none ? "none"  : "table";
     results.style.display = "block";
     results.scrollIntoView({ behavior: "smooth", block: "start" });
   }

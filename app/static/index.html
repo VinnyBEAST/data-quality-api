@@ -5,107 +5,312 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Data Quality Checker</title>
   <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
     body {
       margin: 0;
-      font: 15px/1.5 Arial, Helvetica, sans-serif;
-      color: #222;
-      background: #fff;
+      min-height: 100vh;
+      background: #f0f2f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      font-size: 15px;
+      color: #1a1a2e;
     }
-    main { max-width: 640px; margin: 0 auto; padding: 24px 16px; }
-    h1 { font-size: 22px; font-weight: bold; margin: 0 0 6px; }
-    p { margin: 0 0 20px; }
-    label.file {
-      display: block;
-      border: 1px solid #999;
-      padding: 14px;
-      cursor: pointer;
-    }
-    label.file input { display: none; }
-    .hint { color: #555; font-size: 13px; margin-top: 4px; }
-    button {
-      margin-top: 12px;
-      padding: 8px 16px;
-      font: inherit;
-      border: 1px solid #222;
-      background: #222;
+
+    /* ── top bar ── */
+    header {
+      background: #1a1a2e;
       color: #fff;
-      cursor: pointer;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    button:disabled { background: #ccc; border-color: #ccc; cursor: default; }
+    header svg { flex-shrink: 0; }
+    header h1 {
+      font-size: 17px;
+      font-weight: 600;
+      margin: 0;
+      letter-spacing: .3px;
+    }
+    header span {
+      margin-left: auto;
+      font-size: 12px;
+      opacity: .55;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+
+    /* ── layout ── */
+    main {
+      max-width: 700px;
+      margin: 36px auto;
+      padding: 0 16px 60px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      color: #555;
+      margin: 0 0 10px;
+    }
+
+    /* ── upload card ── */
+    .card {
+      background: #fff;
+      border: 1px solid #dde1e9;
+      border-radius: 6px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    label.drop-zone {
+      display: block;
+      border: 2px dashed #c0c6d4;
+      border-radius: 5px;
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    label.drop-zone:hover,
+    label.drop-zone.over { border-color: #3b6fd4; background: #f4f7ff; }
+    label.drop-zone input { display: none; }
+    .drop-icon { font-size: 32px; line-height: 1; margin-bottom: 8px; }
+    .drop-main { font-weight: 600; color: #3b6fd4; }
+    .drop-sub { font-size: 13px; color: #888; margin-top: 4px; }
+    .drop-file { font-weight: 600; color: #1a1a2e; font-size: 14px; }
+
+    .col-hint {
+      margin-top: 14px;
+      font-size: 12px;
+      color: #888;
+    }
+    .col-hint strong { color: #555; }
+
+    .btn {
+      margin-top: 16px;
+      width: 100%;
+      padding: 11px;
+      font: 600 15px inherit;
+      background: #1a1a2e;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      letter-spacing: .3px;
+      transition: background .15s;
+    }
+    .btn:hover:not(:disabled) { background: #2e2e50; }
+    .btn:disabled { background: #b0b4be; cursor: default; }
+
+    /* ── error banner ── */
     #error {
       display: none;
-      margin: 16px 0;
-      padding: 10px;
-      border: 1px solid #a00;
-      color: #a00;
+      padding: 12px 16px;
+      background: #fff3f3;
+      border: 1px solid #f5b8b8;
+      border-radius: 5px;
+      color: #b00;
+      font-size: 14px;
+      margin-bottom: 20px;
     }
-    #results { margin-top: 24px; }
-    .counts { margin: 0 0 16px; }
-    .counts span { display: inline-block; margin-right: 24px; }
-    .counts b { font-size: 20px; }
-    h2 { font-size: 16px; margin: 0 0 8px; }
+
+    /* ── results ── */
+    #results { display: none; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-box {
+      background: #fff;
+      border: 1px solid #dde1e9;
+      border-radius: 6px;
+      padding: 18px 12px;
+      text-align: center;
+    }
+    .stat-box .num {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-box .lbl { font-size: 12px; color: #888; letter-spacing: .3px; }
+    .stat-box.clean .num { color: #1a7a45; }
+    .stat-box.problems .num { color: #c0392b; }
+    .stat-box.total .num { color: #1a1a2e; }
+
+    .table-card {
+      background: #fff;
+      border: 1px solid #dde1e9;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .table-head {
+      padding: 14px 20px;
+      border-bottom: 1px solid #dde1e9;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .table-head h2 { font-size: 15px; font-weight: 600; margin: 0; }
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: #fde8e8;
+      color: #c0392b;
+    }
+    .badge.ok { background: #e3f6ec; color: #1a7a45; }
+
     table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid #ccc; vertical-align: top; }
-    th { font-weight: bold; }
-    #allgood { padding: 10px 0; }
-    .hidden { display: none; }
+    th {
+      background: #f8f9fb;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      color: #888;
+      padding: 9px 20px;
+      text-align: left;
+      border-bottom: 1px solid #dde1e9;
+    }
+    td {
+      padding: 10px 20px;
+      font-size: 14px;
+      border-bottom: 1px solid #f0f2f5;
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8f9fb; }
+
+    .row-num {
+      font-weight: 600;
+      color: #3b6fd4;
+      font-variant-numeric: tabular-nums;
+    }
+    .col-name { font-weight: 500; color: #1a1a2e; }
+    .problem-text { color: #555; }
+
+    .all-good {
+      padding: 24px 20px;
+      text-align: center;
+      color: #1a7a45;
+      font-weight: 500;
+    }
+    .all-good .check { font-size: 28px; display: block; margin-bottom: 6px; }
+
+    @media (max-width: 480px) {
+      .stats-row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-<main>
-  <h1>Data Quality Checker</h1>
-  <p>Upload a CSV of survey records to find missing fields, bad coordinates and duplicate IDs.</p>
 
-  <form id="form">
-    <label class="file" id="drop">
-      <input type="file" id="file" accept=".csv,text/csv">
-      <span id="label">Choose a CSV file, or drop one here</span>
-      <div class="hint">Required columns: record_id, name, district, latitude, longitude</div>
-    </label>
-    <button id="submit" type="submit" disabled>Check file</button>
-  </form>
+<header>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+       stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+    <polyline points="14 2 14 8 20 8"/>
+    <line x1="9" y1="13" x2="15" y2="13"/>
+    <line x1="9" y1="17" x2="12" y2="17"/>
+  </svg>
+  <h1>Data Quality Checker</h1>
+  <span>Survey Records</span>
+</header>
+
+<main>
+
+  <p class="section-title">Upload file</p>
+  <div class="card">
+    <form id="form">
+      <label class="drop-zone" id="drop">
+        <input type="file" id="file" accept=".csv,text/csv">
+        <div class="drop-icon">📄</div>
+        <div id="drop-main" class="drop-main">Choose a CSV file</div>
+        <div class="drop-sub">or drag and drop it here</div>
+      </label>
+      <div class="col-hint">
+        <strong>Required columns:</strong> record_id, name, district, latitude, longitude
+      </div>
+      <button class="btn" id="submit" type="submit" disabled>Check file</button>
+    </form>
+  </div>
 
   <div id="error" role="alert"></div>
 
-  <section id="results" class="hidden">
-    <p class="counts">
-      <span><b id="rows">0</b> rows</span>
-      <span><b id="clean">0</b> clean</span>
-      <span><b id="issueCount">0</b> problems</span>
-    </p>
-    <div id="allgood" class="hidden">No problems found.</div>
-    <div id="issuesWrap" class="hidden">
-      <h2>Problems</h2>
-      <table>
-        <thead><tr><th>Row</th><th>Column</th><th>Problem</th></tr></thead>
+  <section id="results">
+    <p class="section-title">Results</p>
+    <div class="stats-row">
+      <div class="stat-box total">
+        <div class="num" id="rows">0</div>
+        <div class="lbl">Rows in file</div>
+      </div>
+      <div class="stat-box clean">
+        <div class="num" id="clean">0</div>
+        <div class="lbl">Clean rows</div>
+      </div>
+      <div class="stat-box problems">
+        <div class="num" id="issueCount">0</div>
+        <div class="lbl">Problems found</div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-head">
+        <h2>Issues</h2>
+        <span id="badge" class="badge">0</span>
+      </div>
+      <div id="allgood" class="all-good" style="display:none">
+        <span class="check">✓</span>
+        Every row passed all checks.
+      </div>
+      <table id="issuesTable" style="display:none">
+        <thead>
+          <tr>
+            <th>Row</th>
+            <th>Column</th>
+            <th>Problem</th>
+          </tr>
+        </thead>
         <tbody id="issues"></tbody>
       </table>
     </div>
   </section>
+
 </main>
 
 <script>
-  const form = document.getElementById("form");
-  const fileInput = document.getElementById("file");
-  const drop = document.getElementById("drop");
-  const label = document.getElementById("label");
-  const submit = document.getElementById("submit");
-  const errorBox = document.getElementById("error");
-  const results = document.getElementById("results");
+  const form       = document.getElementById("form");
+  const fileInput  = document.getElementById("file");
+  const drop       = document.getElementById("drop");
+  const dropMain   = document.getElementById("drop-main");
+  const submit     = document.getElementById("submit");
+  const errorBox   = document.getElementById("error");
+  const results    = document.getElementById("results");
 
   function setFile(file) {
     if (!file) return;
-    label.textContent = file.name + " selected";
+    drop.querySelector(".drop-icon").textContent = "📋";
+    dropMain.textContent = file.name;
+    dropMain.className = "drop-file";
     submit.disabled = false;
   }
 
   fileInput.addEventListener("change", () => setFile(fileInput.files[0]));
 
-  ["dragenter", "dragover"].forEach(evt =>
-    drop.addEventListener(evt, e => e.preventDefault()));
-  drop.addEventListener("drop", e => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
+  ["dragenter","dragover"].forEach(e =>
+    drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave","drop"].forEach(e =>
+    drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove("over"); }));
+  drop.addEventListener("drop", ev => {
+    const file = ev.dataTransfer.files[0];
     if (file) {
       const dt = new DataTransfer();
       dt.items.add(file);
@@ -114,36 +319,46 @@
     }
   });
 
-  function showError(message) {
-    errorBox.textContent = message;
-    errorBox.style.display = "block";
-    results.classList.add("hidden");
-  }
-
-  function cell(text) {
+  function cell(text, cls) {
     const td = document.createElement("td");
     td.textContent = text;
+    if (cls) td.className = cls;
     return td;
+  }
+
+  function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.style.display = "block";
+    results.style.display = "none";
   }
 
   function showResults(data) {
     errorBox.style.display = "none";
-    document.getElementById("rows").textContent = data.rows;
-    document.getElementById("clean").textContent = data.clean_rows;
+    document.getElementById("rows").textContent       = data.rows;
+    document.getElementById("clean").textContent      = data.clean_rows;
     document.getElementById("issueCount").textContent = data.issues.length;
 
-    const body = document.getElementById("issues");
-    body.innerHTML = "";
+    const badge = document.getElementById("badge");
+    badge.textContent = data.issues.length;
+    badge.className = data.issues.length === 0 ? "badge ok" : "badge";
+
+    const tbody = document.getElementById("issues");
+    tbody.innerHTML = "";
     data.issues.forEach(issue => {
       const tr = document.createElement("tr");
-      tr.append(cell(issue.row ?? "-"), cell(issue.column ?? "-"), cell(issue.problem));
-      body.append(tr);
+      tr.append(
+        cell(issue.row    ?? "—", "row-num"),
+        cell(issue.column ?? "—", "col-name"),
+        cell(issue.problem,       "problem-text")
+      );
+      tbody.append(tr);
     });
 
     const none = data.issues.length === 0;
-    document.getElementById("allgood").classList.toggle("hidden", !none);
-    document.getElementById("issuesWrap").classList.toggle("hidden", none);
-    results.classList.remove("hidden");
+    document.getElementById("allgood").style.display      = none ? "block" : "none";
+    document.getElementById("issuesTable").style.display  = none ? "none"  : "table";
+    results.style.display = "block";
+    results.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   form.addEventListener("submit", async e => {
@@ -153,21 +368,18 @@
 
     errorBox.style.display = "none";
     submit.disabled = true;
-    submit.textContent = "Checking...";
+    submit.textContent = "Checking…";
 
     const body = new FormData();
     body.append("file", file);
 
     try {
-      const response = await fetch("/validate", { method: "POST", body });
-      const data = await response.json();
-      if (!response.ok) {
-        showError(data.detail || "The file could not be checked.");
-      } else {
-        showResults(data);
-      }
-    } catch (err) {
-      showError("Could not reach the server. Check that it is running and try again.");
+      const res  = await fetch("/validate", { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok) showError(data.detail || "The file could not be checked.");
+      else showResults(data);
+    } catch {
+      showError("Could not reach the server. Make sure it is running and try again.");
     } finally {
       submit.disabled = false;
       submit.textContent = "Check file";

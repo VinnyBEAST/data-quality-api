@@ -1,5 +1,7 @@
 # Data Quality API
 
+**Live app:** https://data-quality-api-yyye.onrender.com
+
 A small FastAPI service that checks survey-style CSV files for common problems
 and returns a JSON report.
 

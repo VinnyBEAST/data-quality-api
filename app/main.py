@@ -1,17 +1,25 @@
 import io
+from pathlib import Path
 
 import pandas as pd
 from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi.responses import FileResponse
 
-from app.qc import run_checks
+from app.qc import normalize_headers, run_checks
 
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
+PAGE = Path(__file__).parent / "static" / "index.html"
 
 app = FastAPI(
     title="Data Quality API",
     description="Upload a CSV of survey records and get a quality report.",
     version="0.1.0",
 )
+
+
+@app.get("/", include_in_schema=False)
+def upload_page() -> FileResponse:
+    return FileResponse(PAGE)
 
 
 @app.get("/health")
@@ -29,8 +37,11 @@ async def validate(file: UploadFile) -> dict:
         raise HTTPException(status_code=413, detail="File is larger than 5 MB")
 
     try:
-        df = pd.read_csv(io.BytesIO(content), dtype=str, keep_default_na=True)
-    except (pd.errors.ParserError, UnicodeDecodeError) as exc:
+        # utf-8-sig also handles files saved by Excel, which add a hidden byte-order mark.
+        df = pd.read_csv(io.BytesIO(content), dtype=str, encoding="utf-8-sig")
+    except UnicodeDecodeError:
+        raise HTTPException(status_code=400, detail="File must be UTF-8 encoded")
+    except (pd.errors.ParserError, pd.errors.EmptyDataError) as exc:
         raise HTTPException(status_code=400, detail=f"Could not read CSV: {exc}")
 
-    return {"filename": file.filename, **run_checks(df)}
+    return {"filename": file.filename, **run_checks(normalize_headers(df))}

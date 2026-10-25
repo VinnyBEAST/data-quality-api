@@ -22,6 +22,15 @@ class Issue:
         return asdict(self)
 
 
+def normalize_headers(df: pd.DataFrame) -> pd.DataFrame:
+    """Make headers match the required names: "Record ID " becomes "record_id"."""
+    df = df.copy()
+    df.columns = [
+        str(c).strip().lower().replace(" ", "_").replace("-", "_") for c in df.columns
+    ]
+    return df
+
+
 def check_columns(df: pd.DataFrame) -> list[Issue]:
     missing = [c for c in REQUIRED_COLUMNS if c not in df.columns]
     return [Issue(None, c, "missing required column") for c in missing]

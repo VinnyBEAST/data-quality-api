@@ -1,0 +1,9 @@
+record_id,name,district,latitude,longitude
+T01,Amina Okello,Gulu,2.77,32.30
+T02,Ben Otieno,Mbale,1.08,34.18
+T03,Grace Atim,,2.45,32.90
+T04,Peter Mugisha,Kabale,-1.25,29.99
+T02,Ben Duplicate,Mbale,1.08,34.18
+T05,Sarah Nakato,Jinja,0.44,abc
+T06,David Lubega,Masaka,95.0,31.70
+T07,Esther Namara,Mbarara,-0.61,30.65

@@ -5,92 +5,78 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Data Quality Checker</title>
   <style>
-    :root {
-      --bg: #f5f7fa; --card: #ffffff; --text: #1d2433; --muted: #5b6475;
-      --line: #dfe4ec; --accent: #2b6cb0; --ok: #2f855a; --bad: #c53030;
-      --bad-bg: #fff5f5; --ok-bg: #f0fff4;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #111827; --card: #1f2937; --text: #e5e7eb; --muted: #9ca3af;
-        --line: #374151; --accent: #63b3ed; --ok: #68d391; --bad: #fc8181;
-        --bad-bg: #3b1d1d; --ok-bg: #1c3327;
-      }
-    }
-    * { box-sizing: border-box; }
     body {
-      margin: 0; background: var(--bg); color: var(--text);
-      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+      margin: 0;
+      font: 15px/1.5 Arial, Helvetica, sans-serif;
+      color: #222;
+      background: #fff;
     }
-    main { max-width: 760px; margin: 0 auto; padding: 32px 16px; }
-    h1 { font-size: 1.6rem; margin: 0 0 4px; }
-    .lead { color: var(--muted); margin: 0 0 24px; }
-    .card {
-      background: var(--card); border: 1px solid var(--line);
-      border-radius: 10px; padding: 20px; margin-bottom: 16px;
-    }
-    .drop {
-      border: 2px dashed var(--line); border-radius: 10px; padding: 28px;
-      text-align: center; cursor: pointer; transition: border-color .15s;
-    }
-    .drop:hover, .drop.over { border-color: var(--accent); }
-    .drop input { display: none; }
-    .drop strong { color: var(--accent); }
-    .hint { color: var(--muted); font-size: .9rem; margin-top: 8px; }
-    button {
-      margin-top: 16px; width: 100%; padding: 12px; font-size: 1rem;
-      border: 0; border-radius: 8px; background: var(--accent); color: #fff;
+    main { max-width: 640px; margin: 0 auto; padding: 24px 16px; }
+    h1 { font-size: 22px; font-weight: bold; margin: 0 0 6px; }
+    p { margin: 0 0 20px; }
+    label.file {
+      display: block;
+      border: 1px solid #999;
+      padding: 14px;
       cursor: pointer;
     }
-    button:disabled { opacity: .5; cursor: default; }
-    .error {
-      background: var(--bad-bg); color: var(--bad); border-radius: 8px;
-      padding: 12px 14px; margin-bottom: 16px; display: none;
+    label.file input { display: none; }
+    .hint { color: #555; font-size: 13px; margin-top: 4px; }
+    button {
+      margin-top: 12px;
+      padding: 8px 16px;
+      font: inherit;
+      border: 1px solid #222;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
     }
-    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .stat { text-align: center; padding: 14px 8px; border-radius: 8px; background: var(--bg); }
-    .stat b { display: block; font-size: 1.8rem; }
-    .stat span { color: var(--muted); font-size: .85rem; }
-    .good b { color: var(--ok); }
-    .bad b { color: var(--bad); }
-    table { width: 100%; border-collapse: collapse; margin-top: 4px; }
-    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); }
-    th { font-size: .85rem; color: var(--muted); font-weight: 600; }
-    .allgood { background: var(--ok-bg); color: var(--ok); padding: 12px; border-radius: 8px; }
+    button:disabled { background: #ccc; border-color: #ccc; cursor: default; }
+    #error {
+      display: none;
+      margin: 16px 0;
+      padding: 10px;
+      border: 1px solid #a00;
+      color: #a00;
+    }
+    #results { margin-top: 24px; }
+    .counts { margin: 0 0 16px; }
+    .counts span { display: inline-block; margin-right: 24px; }
+    .counts b { font-size: 20px; }
+    h2 { font-size: 16px; margin: 0 0 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid #ccc; vertical-align: top; }
+    th { font-weight: bold; }
+    #allgood { padding: 10px 0; }
     .hidden { display: none; }
-    @media (max-width: 480px) {
-      .summary { grid-template-columns: 1fr; }
-    }
   </style>
 </head>
 <body>
 <main>
   <h1>Data Quality Checker</h1>
-  <p class="lead">Upload a CSV of survey records to find missing fields, bad coordinates and duplicate IDs.</p>
+  <p>Upload a CSV of survey records to find missing fields, bad coordinates and duplicate IDs.</p>
 
-  <form id="form" class="card">
-    <label class="drop" id="drop">
+  <form id="form">
+    <label class="file" id="drop">
       <input type="file" id="file" accept=".csv,text/csv">
-      <div id="label"><strong>Choose a CSV file</strong> or drop it here</div>
+      <span id="label">Choose a CSV file, or drop one here</span>
       <div class="hint">Required columns: record_id, name, district, latitude, longitude</div>
     </label>
     <button id="submit" type="submit" disabled>Check file</button>
   </form>
 
-  <div id="error" class="error" role="alert"></div>
+  <div id="error" role="alert"></div>
 
   <section id="results" class="hidden">
-    <div class="card">
-      <div class="summary">
-        <div class="stat"><b id="rows">0</b><span>rows in file</span></div>
-        <div class="stat good"><b id="clean">0</b><span>clean rows</span></div>
-        <div class="stat bad"><b id="issueCount">0</b><span>problems found</span></div>
-      </div>
-    </div>
-    <div class="card" id="issuesCard">
-      <h2 style="font-size:1.1rem;margin:0 0 8px">Problems</h2>
-      <div id="allgood" class="allgood hidden">No problems found. Every row passed.</div>
-      <table id="issuesTable" class="hidden">
+    <p class="counts">
+      <span><b id="rows">0</b> rows</span>
+      <span><b id="clean">0</b> clean</span>
+      <span><b id="issueCount">0</b> problems</span>
+    </p>
+    <div id="allgood" class="hidden">No problems found.</div>
+    <div id="issuesWrap" class="hidden">
+      <h2>Problems</h2>
+      <table>
         <thead><tr><th>Row</th><th>Column</th><th>Problem</th></tr></thead>
         <tbody id="issues"></tbody>
       </table>
@@ -109,20 +95,16 @@
 
   function setFile(file) {
     if (!file) return;
-    label.innerHTML = "";
-    const name = document.createElement("strong");
-    name.textContent = file.name;
-    label.append(name, " selected");
+    label.textContent = file.name + " selected";
     submit.disabled = false;
   }
 
   fileInput.addEventListener("change", () => setFile(fileInput.files[0]));
 
   ["dragenter", "dragover"].forEach(evt =>
-    drop.addEventListener(evt, e => { e.preventDefault(); drop.classList.add("over"); }));
-  ["dragleave", "drop"].forEach(evt =>
-    drop.addEventListener(evt, e => { e.preventDefault(); drop.classList.remove("over"); }));
+    drop.addEventListener(evt, e => e.preventDefault()));
   drop.addEventListener("drop", e => {
+    e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file) {
       const dt = new DataTransfer();
@@ -145,6 +127,7 @@
   }
 
   function showResults(data) {
+    errorBox.style.display = "none";
     document.getElementById("rows").textContent = data.rows;
     document.getElementById("clean").textContent = data.clean_rows;
     document.getElementById("issueCount").textContent = data.issues.length;
@@ -159,9 +142,8 @@
 
     const none = data.issues.length === 0;
     document.getElementById("allgood").classList.toggle("hidden", !none);
-    document.getElementById("issuesTable").classList.toggle("hidden", none);
+    document.getElementById("issuesWrap").classList.toggle("hidden", none);
     results.classList.remove("hidden");
-    results.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   form.addEventListener("submit", async e => {
